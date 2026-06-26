@@ -1,15 +1,60 @@
 classDiagram
-    %% Replace the placeholders below with your actual classes, attributes, methods, and relationships.
-    %% Keep this file updated so it matches your final implementation.
+    %% PawPal+ class diagram
+    %% A pet-care planning assistant: an Owner has Pets, each Pet has care Tasks,
+    %% and the Scheduler turns those Tasks into an ordered daily Schedule.
 
-    class ClassName {
-        +type attribute
-        +method() returnType
+    class Owner {
+        +str name
+        +list~Pet~ pets
+        +dict preferences
+        +add_pet(pet: Pet) void
+        +list_pets() list~Pet~
     }
 
-    class AnotherClass {
-        +type attribute
-        +method() returnType
+    class Pet {
+        +str name
+        +str species
+        +list~Task~ tasks
+        +add_task(task: Task) void
+        +daily_tasks() list~Task~
     }
 
-    ClassName --> AnotherClass : relationship
+    class Task {
+        +str title
+        +int duration_minutes
+        +str priority
+        +bool completed
+        +priority_weight() int
+        +mark_done() void
+    }
+
+    class Schedule {
+        +date day
+        +list~ScheduledTask~ items
+        +int total_minutes
+        +add(task: Task, start: time) void
+        +explain() str
+    }
+
+    class ScheduledTask {
+        +Task task
+        +time start_time
+        +time end_time
+        +str reason
+    }
+
+    class Scheduler {
+        +int available_minutes
+        +list~str~ priority_order
+        +build_schedule(pet: Pet) Schedule
+        +sort_tasks(tasks: list~Task~) list~Task~
+        +fits(task: Task, used: int) bool
+    }
+
+    Owner "1" o-- "many" Pet : owns
+    Pet "1" o-- "many" Task : has
+    Scheduler ..> Pet : reads tasks from
+    Scheduler ..> Task : selects & orders
+    Scheduler --> Schedule : produces
+    Schedule "1" *-- "many" ScheduledTask : contains
+    ScheduledTask --> Task : wraps
