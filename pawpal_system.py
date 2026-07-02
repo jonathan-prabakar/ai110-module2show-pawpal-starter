@@ -41,6 +41,11 @@ class Pet:
     breed: str = ""
     age: int = 0
     special_needs: list = field(default_factory=list)
+    tasks: list = field(default_factory=list)
+
+    def add_task(self, task) -> None:
+        """Attach a care task to this pet."""
+        self.tasks.append(task)
 
     def add_special_need(self, need: str) -> None:
         """Record a special care need for this pet."""
@@ -63,10 +68,15 @@ class Task:
     is_recurring: bool = False
     preferred_time: str = ""
     notes: str = ""
+    completed: bool = False
 
     def is_high_priority(self) -> bool:
         """Return True if this task is high priority."""
-        raise NotImplementedError
+        return self.priority.lower() == "high"
+
+    def mark_complete(self) -> None:
+        """Mark this task as completed."""
+        self.completed = True
 
 
 @dataclass
@@ -79,34 +89,51 @@ class Schedule:
     task_pool: list[Task] = field(default_factory=list)
     tasks: list[Task] = field(default_factory=list)
 
+    _RANK = {"high": 0, "medium": 1, "low": 2}
+
     def generate_plan(self) -> None:
         """Select and order tasks from the pool into the day plan."""
-        raise NotImplementedError
+        self.tasks = self.filter_tasks()
 
     def sort_tasks(self) -> list[Task]:
-        """Order tasks by priority (and any other constraints)."""
-        raise NotImplementedError
+        """Order tasks by priority, then preferred time."""
+        return sorted(
+            self.task_pool,
+            key=lambda t: (self._RANK.get(t.priority.lower(), 1), t.preferred_time),
+        )
 
     def filter_tasks(self) -> list[Task]:
-        """Drop tasks that cannot or should not be scheduled."""
-        raise NotImplementedError
+        """Keep sorted tasks that fit the owner's time budget."""
+        planned, used = [], 0
+        for task in self.sort_tasks():
+            if used + task.duration_minutes <= self.owner.available_minutes:
+                planned.append(task)
+                used += task.duration_minutes
+        return planned
 
     def explain_plan(self) -> str:
-        """Return a human-readable explanation of why/when each task runs."""
-        raise NotImplementedError
+        """Return a terminal-friendly summary of the day plan."""
+        lines = [f"Today's Schedule ({self.date}) for {self.pet.name}:"]
+        for task in self.tasks:
+            lines.append(
+                f"  {task.preferred_time or '--:--'}  {task.name}"
+                f"  ({task.duration_minutes} min, {task.priority})"
+            )
+        lines.append(f"  Total: {self.get_total_duration()} min")
+        return "\n".join(lines)
 
     def add_task(self, task: Task) -> None:
-        """Add a task to the planned schedule."""
-        raise NotImplementedError
+        """Add a task to the pool."""
+        self.task_pool.append(task)
 
     def remove_task(self, task_id: str) -> None:
-        """Remove a task from the planned schedule by id."""
-        raise NotImplementedError
+        """Remove a task from the pool by id."""
+        self.task_pool = [t for t in self.task_pool if t.task_id != task_id]
 
     def get_total_duration(self) -> int:
         """Return the total minutes of all scheduled tasks."""
-        raise NotImplementedError
+        return sum(t.duration_minutes for t in self.tasks)
 
     def is_within_budget(self) -> bool:
         """Return True if the plan fits the owner's available time."""
-        raise NotImplementedError
+        return self.get_total_duration() <= self.owner.available_minutes

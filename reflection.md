@@ -18,13 +18,17 @@ scheduler
 - What classes did you include, and what responsibilities did you assign to each?
 
 The Design has 4 classes
-    Owner- name, preferences,owned pets, can append pets list
-    -Pet: name, species, care tasks list, breed, age
-    -Task: a care item with title, duration, priority and completion state, task_id
-    -Schedule: plan, total minutes, explain() method
+    Owner- name, available mins, preferences
+      - can get available mins, add available times, and set preferences
+  - 
+    Schedule: date, owner, pet, task_pool, tasks
+
+    -Pet: name, species, breed, age, special_needs
+
+    -Task: task_id, name, category, duration_minutes, priority, is_recurring, preferred_time, notes
 
   
-  Owner owns pet, pet has tasks, scheduler reads from pet/task, produces a schedule with scheduledtasks
+
 
 **b. Design changes**
 
