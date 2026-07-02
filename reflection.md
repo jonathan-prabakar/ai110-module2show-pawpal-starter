@@ -2,10 +2,29 @@
 
 ## 1. System Design
 
-**a. Initial design**
+1. Produce daily plans
+2. Be able to add pets and owner info
+3. Generate availability display
 
+Step 2: 
+
+Owner class - 
+pet class
+schedule
+scheduler
+
+**a. Initial design**
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
+
+The Design has 4 classes
+    Owner- name, preferences,owned pets, can append pets list
+    -Pet: name, species, care tasks list, breed, age
+    -Task: a care item with title, duration, priority and completion state, task_id
+    -Schedule: plan, total minutes, explain() method
+
+  
+  Owner owns pet, pet has tasks, scheduler reads from pet/task, produces a schedule with scheduledtasks
 
 **b. Design changes**
 

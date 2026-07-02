@@ -1,113 +1,112 @@
 """PawPal+ system skeleton.
 
-Class stubs generated from diagrams/uml.mmd. Data-style objects use
-dataclasses; the Scheduler holds the planning logic. Method bodies are
-intentionally left unimplemented (raise NotImplementedError) so the
-structure matches the UML before behavior is filled in.
+Class stubs generated from diagrams/uml.mmd. Data-style objects (Owner,
+Pet, Task) use dataclasses; Schedule holds the planning logic. Method
+bodies are intentionally left unimplemented (raise NotImplementedError)
+so the structure matches the UML before behavior is filled in.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, time
 
 
 @dataclass
-class Task:
-    """A single pet-care item to be scheduled."""
+class Owner:
+    """The person planning care, with their time budget and preferences."""
 
-    title: str
-    duration_minutes: int
-    priority: str = "medium"  # "low" | "medium" | "high"
-    completed: bool = False
+    name: str
+    available_minutes: int = 0
+    preferences: dict = field(default_factory=dict)
 
-    def priority_weight(self) -> int:
-        """Convert the priority label into a sortable number."""
+    def get_available_times(self) -> int:
+        """Return the owner's available minutes for the day."""
         raise NotImplementedError
 
-    def mark_done(self) -> None:
-        """Mark this task as completed."""
+    def add_available_times(self, minutes: int) -> int:
+        """Add to the owner's available time budget; return the new total."""
+        raise NotImplementedError
+
+    def set_preferences(self, prefs: dict) -> None:
+        """Replace or update the owner's scheduling preferences."""
         raise NotImplementedError
 
 
 @dataclass
 class Pet:
-    """A pet owned by an Owner, with its own care tasks."""
+    """A pet being cared for, with profile and special needs."""
 
     name: str
     species: str
-    tasks: list[Task] = field(default_factory=list)
+    breed: str = ""
+    age: int = 0
+    special_needs: list = field(default_factory=list)
 
-    def add_task(self, task: Task) -> None:
-        """Attach a care task to this pet."""
+    def add_special_need(self, need: str) -> None:
+        """Record a special care need for this pet."""
         raise NotImplementedError
 
-    def daily_tasks(self) -> list[Task]:
-        """Return the tasks that should be considered for today."""
+    def get_profile(self) -> dict:
+        """Return a summary profile of the pet."""
         raise NotImplementedError
 
 
 @dataclass
-class Owner:
-    """The person planning care for one or more pets."""
+class Task:
+    """A single pet-care item that can be scheduled."""
 
+    task_id: str
     name: str
-    pets: list[Pet] = field(default_factory=list)
-    preferences: dict = field(default_factory=dict)
+    category: str = ""
+    duration_minutes: int = 0
+    priority: str = "medium"  # "low" | "medium" | "high"
+    is_recurring: bool = False
+    preferred_time: str = ""
+    notes: str = ""
 
-    def add_pet(self, pet: Pet) -> None:
-        """Register a pet under this owner."""
+    def is_high_priority(self) -> bool:
+        """Return True if this task is high priority."""
         raise NotImplementedError
-
-    def list_pets(self) -> list[Pet]:
-        """Return all pets owned."""
-        raise NotImplementedError
-
-
-@dataclass
-class ScheduledTask:
-    """A Task placed at a specific time slot, with an explanation."""
-
-    task: Task
-    start_time: time
-    end_time: time
-    reason: str = ""
 
 
 @dataclass
 class Schedule:
-    """The produced plan for a single day."""
+    """Builds and holds a day plan for one owner and pet."""
 
-    day: date
-    items: list[ScheduledTask] = field(default_factory=list)
-    total_minutes: int = 0
+    date: str
+    owner: Owner
+    pet: Pet
+    task_pool: list[Task] = field(default_factory=list)
+    tasks: list[Task] = field(default_factory=list)
 
-    def add(self, task: Task, start: time) -> None:
-        """Place a task into the schedule starting at the given time."""
+    def generate_plan(self) -> None:
+        """Select and order tasks from the pool into the day plan."""
         raise NotImplementedError
 
-    def explain(self) -> str:
-        """Return a human-readable explanation of why/when each task runs."""
-        raise NotImplementedError
-
-
-@dataclass
-class Scheduler:
-    """Turns a pet's tasks into an ordered daily Schedule."""
-
-    available_minutes: int = 8 * 60
-    priority_order: list[str] = field(
-        default_factory=lambda: ["high", "medium", "low"]
-    )
-
-    def build_schedule(self, pet: Pet) -> Schedule:
-        """Select and order a pet's tasks into a day plan."""
-        raise NotImplementedError
-
-    def sort_tasks(self, tasks: list[Task]) -> list[Task]:
+    def sort_tasks(self) -> list[Task]:
         """Order tasks by priority (and any other constraints)."""
         raise NotImplementedError
 
-    def fits(self, task: Task, used: int) -> bool:
-        """Return True if the task fits within the remaining time budget."""
+    def filter_tasks(self) -> list[Task]:
+        """Drop tasks that cannot or should not be scheduled."""
+        raise NotImplementedError
+
+    def explain_plan(self) -> str:
+        """Return a human-readable explanation of why/when each task runs."""
+        raise NotImplementedError
+
+    def add_task(self, task: Task) -> None:
+        """Add a task to the planned schedule."""
+        raise NotImplementedError
+
+    def remove_task(self, task_id: str) -> None:
+        """Remove a task from the planned schedule by id."""
+        raise NotImplementedError
+
+    def get_total_duration(self) -> int:
+        """Return the total minutes of all scheduled tasks."""
+        raise NotImplementedError
+
+    def is_within_budget(self) -> bool:
+        """Return True if the plan fits the owner's available time."""
         raise NotImplementedError
