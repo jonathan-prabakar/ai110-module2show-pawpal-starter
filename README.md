@@ -83,11 +83,12 @@ Sample test output:
 > Fill in once you've implemented scheduling logic.
 
 | Feature | Method(s) | Notes |
-|---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+|Plan Generation|Schedule.generate_plan()|fill task from pool|
+| Priority Sorting |Schedule.sort_tasks() | orders by priority rank, then preferred time |
+| Chronological Sorting |Schedule.sort_by_time() | orders by preferred_time converted to mins; untimed tasks pushed to end of day |
+| Completion filter |Schedule.filter_by_completion | done vs not done |
+| Pet filter |Schedule.filter_by_pet(pet_name) | tasks belonging to a named pet |
+|Time-slot Conflict| Schedule.detect_conflicts()|groups scheduled tasks by HH:MM slot,
 
 ## 📸 Demo Walkthrough
 

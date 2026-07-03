@@ -46,8 +46,25 @@ The Design has 4 classes
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+My `detect_conflicts()` method only flags tasks that share the **exact same
+`preferred_time`** (for example two tasks both set to `08:00`). It does *not*
+account for overlapping durations — a 30-minute walk starting at `08:00` and a
+task at `08:15` genuinely collide in real life, but my scheduler treats them as
+conflict-free because their start strings differ.
+
+This tradeoff is reasonable for the scenario because:
+
+- **Simplicity and safety.** The exact-match check is a lightweight string
+  comparison that groups tasks by slot and returns warning messages instead of
+  crashing. There is no time-math to get wrong.
+- **Fits the input.** Owners enter round, human-friendly times (`08:00`,
+  `12:00`), so exact collisions are the common real-world case.
+- **Cheap to extend later.** All conflict logic lives in one method, so upgrading
+  to true overlap detection (using each task's `duration_minutes` to compare time
+  ranges) is a localized change if the need arises.
+
+The cost is that near-miss overlaps go undetected, so the warning is a helpful
+heads-up rather than a guarantee of a clash-free day.
 
 ---
 
