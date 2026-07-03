@@ -177,13 +177,14 @@ def test_sort_by_time_accepts_single_digit_hour():
     assert [t.task_id for t in sched.sort_by_time()] == ["t2", "t1"]
 
 
-@pytest.mark.xfail(reason="sort_by_time does int() on time parts; malformed "
-                          "preferred_time raises ValueError instead of being "
-                          "handled gracefully.")
-def test_sort_by_time_malformed_time_is_handled():
-    pool = [Task("t1", "Bad", preferred_time="8:00am")]
+def test_sort_by_time_malformed_time_sorts_to_end():
+    pool = [
+        Task("t1", "Bad", preferred_time="8:00am"),
+        Task("t2", "Good", preferred_time="07:00"),
+    ]
     sched = make_schedule(pool=pool)
-    sched.sort_by_time()  # currently raises ValueError
+    # Malformed time is treated as end-of-day, so the valid task comes first.
+    assert [t.task_id for t in sched.sort_by_time()] == ["t2", "t1"]
 
 
 def test_unknown_priority_treated_as_medium():

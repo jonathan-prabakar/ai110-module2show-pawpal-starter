@@ -1,0 +1,72 @@
+classDiagram
+    class Owner {
+        +str name
+        +int available_minutes
+        +dict preferences
+        +list pets
+        +add_pet(pet) void
+        +get_available_times() int
+        +add_available_times(minutes) int
+        +set_preferences(prefs) void
+    }
+
+    class Pet {
+        +str name
+        +str species
+        +str breed
+        +int age
+        +list special_needs
+        +list tasks
+        +add_task(task) void
+        +add_special_need(need) void
+        +get_profile() dict
+    }
+
+    class Task {
+        +str task_id
+        +str name
+        +str category
+        +int duration_minutes
+        +str priority
+        +bool is_recurring
+        +str frequency
+        +str due_date
+        +str preferred_time
+        +str notes
+        +bool completed
+        -dict _STEP
+        +is_high_priority() bool
+        +is_recurring_task() bool
+        +next_occurrence() Task
+        +mark_complete() Task
+    }
+
+    class Schedule {
+        +str date
+        +Owner owner
+        +Pet pet
+        +list task_pool
+        +list tasks
+        -dict _RANK
+        +generate_plan() void
+        +sort_tasks() list
+        +filter_tasks() list
+        +sort_by_time() list
+        +filter_by_completion(completed) list
+        +filter_by_pet(pet_name) list
+        +explain_plan() str
+        +add_task(task) void
+        +remove_task(task_id) void
+        +mark_task_complete(task_id) Task
+        +detect_conflicts() list
+        +get_total_duration() int
+        +is_within_budget() bool
+    }
+
+    Owner "1" --> "many" Pet : owns
+    Owner "1" --> "1" Schedule : uses
+    Schedule "1" o-- "many" Task : contains
+    Schedule --> Pet : for
+    Schedule --> Owner : reads budget
+    Pet "1" o-- "many" Task : has
+    Task ..> Task : next_occurrence creates

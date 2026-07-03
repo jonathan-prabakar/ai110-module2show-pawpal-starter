@@ -104,7 +104,60 @@ if owner.pets:
     if st.button("Generate schedule"):
         schedule = Schedule(date="today", owner=owner, pet=pet, task_pool=list(pet.tasks))
         schedule.generate_plan()
-        st.text(schedule.explain_plan())
-        st.write(f"Within budget: {schedule.is_within_budget()}")
+
+        # --- Budget summary ---
+        total = schedule.get_total_duration()
+        if schedule.is_within_budget():
+            st.success(
+                f"✅ Plan fits your day: {total} of {owner.available_minutes} "
+                f"available minutes used ({len(schedule.tasks)} tasks scheduled)."
+            )
+        else:
+            st.error(
+                f"⛔ Plan is over budget: {total} min needed but only "
+                f"{owner.available_minutes} available. Some tasks were dropped."
+            )
+
+        # --- Conflict warnings ---
+        conflicts = schedule.detect_conflicts()
+        if conflicts:
+            for warning in conflicts:
+                st.warning(warning)
+        else:
+            st.info("No time conflicts detected.")
+
+        # --- Scheduled tasks, ordered chronologically ---
+        st.markdown("**Today's plan (chronological):**")
+        scheduled_ids = {t.task_id for t in schedule.tasks}
+        ordered = [t for t in schedule.sort_by_time() if t.task_id in scheduled_ids]
+        if ordered:
+            st.table(
+                [
+                    {
+                        "Time": t.preferred_time or "--:--",
+                        "Task": t.name,
+                        "Minutes": t.duration_minutes,
+                        "Priority": t.priority.capitalize(),
+                    }
+                    for t in ordered
+                ]
+            )
+        else:
+            st.info("No tasks fit today's plan. Add time or reduce tasks.")
+
+        # --- Tasks left out of the plan (didn't fit the budget) ---
+        dropped = [t for t in pet.tasks if t.task_id not in scheduled_ids]
+        if dropped:
+            with st.expander(f"Not scheduled ({len(dropped)} left out of budget)"):
+                st.table(
+                    [
+                        {
+                            "Task": t.name,
+                            "Minutes": t.duration_minutes,
+                            "Priority": t.priority.capitalize(),
+                        }
+                        for t in dropped
+                    ]
+                )
 else:
     st.info("Add a pet before scheduling tasks.")

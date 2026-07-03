@@ -151,8 +151,11 @@ class Schedule:
         def to_minutes(task: Task) -> int:
             if not task.preferred_time or ":" not in task.preferred_time:
                 return 24 * 60  # unscheduled -> end of day
-            hours, minutes = task.preferred_time.split(":")
-            return int(hours) * 60 + int(minutes)
+            hours, minutes = task.preferred_time.split(":", 1)
+            try:
+                return int(hours) * 60 + int(minutes)
+            except ValueError:
+                return 24 * 60  # malformed time -> end of day
 
         return sorted(self.task_pool, key=to_minutes)
 

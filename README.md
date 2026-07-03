@@ -90,14 +90,38 @@ Sample test output:
 | Pet filter |Schedule.filter_by_pet(pet_name) | tasks belonging to a named pet |
 |Time-slot Conflict| Schedule.detect_conflicts()|groups scheduled tasks by HH:MM slot,
 
+
+## Testing PawPal+
+
+python -m pytest
+
+Terminal Output:
+collected 26 items                                                                                                                
+
+tests/test_pawpal.py .............x............                                                                             [100%]
+
+================================================== 25 passed, 1 xfailed in 0.04s ==================================================
+
+
+5 stars
+
+
 ## 📸 Demo Walkthrough
 
 Describe your app in numbered steps so a reader can follow along without watching a video:
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+1. Type Owner name and available minutes today
+2. Scroll down, enter Pet Name and Species, and click "Add pet"
+3. Select dropdown, choose your pet
+4. Enter "Task Title", "Duration", "Priority" and "Preferred Time(HH:MM)
+5. Click add task
+6. Click "Generate Schedule" to see if the plan fits your day today
 
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://10.0.0.71:8501
+
+
+  I learned how to effectively go about creating an app from scratch to the UMD file to functions and testing. 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
